@@ -1,0 +1,60 @@
+{
+  "environment": "production",
+  "status": "approved",
+  "accountable_executive": {
+    "name": "Dana Whitfield",
+    "email": "dana.whitfield@example.com"
+  },
+  "prompt_version": "v1",
+  "exceptions": [],
+  "registered_on": "2026-06-01",
+  "agent_id": "agt-wholesaler-recap",
+  "name": "Wholesaler Meeting Recap",
+  "purpose": "Drafts meeting recaps and follow up tasks for retirement wholesalers in the CRM.",
+  "platform": "agentforce",
+  "vendor": "Salesforce",
+  "platform_ref": "Wholesaler_Recap_Agent",
+  "business_owner": {
+    "name": "Priya Nair",
+    "email": "priya.nair@example.com"
+  },
+  "technical_owner": {
+    "name": "Chris Dunn",
+    "email": "chris.dunn@example.com"
+  },
+  "risk_tier": "medium",
+  "autonomy_level": "assist",
+  "data_classification": "confidential",
+  "models": [
+    {
+      "provider": "salesforce",
+      "model": "vendor-managed",
+      "version": "vendor-managed"
+    }
+  ],
+  "tools": [
+    {
+      "name": "crm_activity_write",
+      "access": "write"
+    }
+  ],
+  "identity": {
+    "type": "service_identity",
+    "principal": "sf-integration-user/recap"
+  },
+  "evaluation": {
+    "last_run": "2026-09-10",
+    "result": "pass",
+    "suite": "recap-accuracy-v1"
+  },
+  "review": {
+    "last_review": "2026-04-15",
+    "next_review": "2026-10-15"
+  },
+  "cost_tags": {
+    "Application": "wholesaler-recap",
+    "ApplicationOwner": "Retirement-Sales",
+    "Environment": "production",
+    "CostCenter": "CC-410"
+  }
+}

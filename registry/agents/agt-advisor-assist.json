@@ -1,0 +1,68 @@
+{
+  "environment": "production",
+  "status": "approved",
+  "accountable_executive": {
+    "name": "Dana Whitfield",
+    "email": "dana.whitfield@example.com"
+  },
+  "prompt_version": "v14",
+  "exceptions": [],
+  "registered_on": "2026-06-01",
+  "agent_id": "agt-advisor-assist",
+  "name": "Advisor Assist",
+  "purpose": "Answers financial advisor questions on products, quotes and forms with citations to approved content.",
+  "platform": "aws-agentcore",
+  "platform_ref": "arn:aws:bedrock-agentcore:us-east-1:111122223333:runtime/advisor-assist",
+  "business_owner": {
+    "name": "Maria Chen",
+    "email": "maria.chen@example.com"
+  },
+  "technical_owner": {
+    "name": "Raj Patel",
+    "email": "raj.patel@example.com"
+  },
+  "risk_tier": "high",
+  "autonomy_level": "act_with_approval",
+  "data_classification": "confidential",
+  "models": [
+    {
+      "provider": "anthropic",
+      "model": "claude-sonnet",
+      "version": "2026-05"
+    }
+  ],
+  "tools": [
+    {
+      "name": "quote_lookup",
+      "access": "read",
+      "mcp_server": "mcp-quotes"
+    },
+    {
+      "name": "create_illustration_request",
+      "access": "write",
+      "mcp_server": "mcp-illustrations"
+    }
+  ],
+  "identity": {
+    "type": "service_identity",
+    "principal": "agentcore-identity/advisor-assist"
+  },
+  "evaluation": {
+    "last_run": "2026-10-28",
+    "result": "pass",
+    "suite": "advisor-golden-set-v6"
+  },
+  "review": {
+    "last_review": "2026-09-15",
+    "next_review": "2026-12-15",
+    "governance_forum": "AI Governance Committee"
+  },
+  "cost_tags": {
+    "Application": "advisor-assist",
+    "ApplicationOwner": "Advisor-Platforms",
+    "Environment": "production",
+    "CostCenter": "CC-210",
+    "Model": "Claude-Sonnet",
+    "Project": "Advisor-Intelligence"
+  }
+}

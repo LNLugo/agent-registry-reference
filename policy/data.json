@@ -1,0 +1,88 @@
+{
+  "agents": {
+    "agt-advisor-assist": {
+      "status": "approved",
+      "risk_tier": "high",
+      "environment": "production",
+      "eval_result": "pass",
+      "eval_last_run": "2026-10-28",
+      "eval_max_age_days": 30,
+      "data_classification": "confidential",
+      "allowed_routes": [
+        "llm-default"
+      ]
+    },
+    "agt-claims-intake": {
+      "status": "approved",
+      "risk_tier": "high",
+      "environment": "production",
+      "eval_result": "pass",
+      "eval_last_run": "2026-08-30",
+      "eval_max_age_days": 30,
+      "data_classification": "restricted",
+      "allowed_routes": [
+        "llm-default"
+      ]
+    },
+    "agt-hr-policy-qa": {
+      "status": "approved",
+      "risk_tier": "low",
+      "environment": "production",
+      "eval_result": "pass",
+      "eval_last_run": "2026-07-20",
+      "eval_max_age_days": 180,
+      "data_classification": "internal",
+      "allowed_routes": [
+        "llm-default"
+      ]
+    },
+    "agt-legacy-faq": {
+      "status": "approved",
+      "risk_tier": "low",
+      "environment": "production",
+      "eval_result": "pass",
+      "eval_last_run": "2026-06-01",
+      "eval_max_age_days": 180,
+      "data_classification": "internal",
+      "allowed_routes": [
+        "llm-default"
+      ]
+    },
+    "agt-policy-servicing": {
+      "status": "approved",
+      "risk_tier": "high",
+      "environment": "production",
+      "eval_result": "pass",
+      "eval_last_run": "2026-10-20",
+      "eval_max_age_days": 30,
+      "data_classification": "restricted",
+      "allowed_routes": [
+        "llm-default"
+      ]
+    },
+    "agt-sourcing-analyst": {
+      "status": "suspended",
+      "risk_tier": "medium",
+      "environment": "production",
+      "eval_result": "fail",
+      "eval_last_run": "2026-09-01",
+      "eval_max_age_days": 90,
+      "data_classification": "confidential",
+      "allowed_routes": [
+        "llm-default"
+      ]
+    },
+    "agt-wholesaler-recap": {
+      "status": "approved",
+      "risk_tier": "medium",
+      "environment": "production",
+      "eval_result": "pass",
+      "eval_last_run": "2026-09-10",
+      "eval_max_age_days": 90,
+      "data_classification": "confidential",
+      "allowed_routes": [
+        "llm-default"
+      ]
+    }
+  }
+}

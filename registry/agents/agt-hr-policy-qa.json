@@ -1,0 +1,67 @@
+{
+  "environment": "production",
+  "status": "approved",
+  "accountable_executive": {
+    "name": "Dana Whitfield",
+    "email": "dana.whitfield@example.com"
+  },
+  "prompt_version": "v1",
+  "exceptions": [
+    {
+      "id": "EXC-014",
+      "reason": "Runs on maker connection until service account is provisioned",
+      "remediation": "Move SharePoint connector to a service principal",
+      "expires": "2026-10-31",
+      "approved_by": "Architecture Review Board"
+    }
+  ],
+  "registered_on": "2026-06-01",
+  "agent_id": "agt-hr-policy-qa",
+  "name": "HR Policy Q&A",
+  "purpose": "Answers employee questions about HR policies from the published policy library.",
+  "platform": "copilot-studio",
+  "platform_ref": "copilot-bot-7f3a2c",
+  "business_owner": {
+    "name": "Lena Brooks",
+    "email": "lena.brooks@example.com"
+  },
+  "technical_owner": {
+    "name": "Sam Okafor",
+    "email": "sam.okafor@example.com"
+  },
+  "risk_tier": "low",
+  "autonomy_level": "assist",
+  "data_classification": "internal",
+  "models": [
+    {
+      "provider": "azure-openai",
+      "model": "gpt-4.1",
+      "version": "2025-04"
+    }
+  ],
+  "tools": [
+    {
+      "name": "sharepoint_policy_search",
+      "access": "read"
+    }
+  ],
+  "identity": {
+    "type": "maker_connection",
+    "principal": "sam.okafor@example.com"
+  },
+  "evaluation": {
+    "last_run": "2026-07-20",
+    "result": "pass",
+    "suite": "hr-faq-v2"
+  },
+  "review": {
+    "last_review": "2026-05-01",
+    "next_review": "2026-11-30"
+  },
+  "cost_tags": {
+    "Application": "hr-policy-qa",
+    "ApplicationOwner": "HR-Technology",
+    "Environment": "production",
+    "CostCenter": "CC-120"
+  }
+}

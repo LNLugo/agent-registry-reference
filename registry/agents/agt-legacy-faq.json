@@ -1,0 +1,54 @@
+{
+  "environment": "production",
+  "status": "approved",
+  "accountable_executive": {
+    "name": "Dana Whitfield",
+    "email": "dana.whitfield@example.com"
+  },
+  "prompt_version": "v1",
+  "exceptions": [],
+  "registered_on": "2026-06-01",
+  "agent_id": "agt-legacy-faq",
+  "name": "Legacy Benefits FAQ",
+  "purpose": "Answers benefits questions for a closed block of group policies.",
+  "platform": "in-house",
+  "platform_ref": "legacy-faq-bot",
+  "business_owner": {
+    "name": "Lena Brooks",
+    "email": "lena.brooks@example.com"
+  },
+  "technical_owner": {
+    "name": "Sam Okafor",
+    "email": "sam.okafor@example.com"
+  },
+  "risk_tier": "low",
+  "autonomy_level": "assist",
+  "data_classification": "internal",
+  "models": [
+    {
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "version": "2024-07"
+    }
+  ],
+  "tools": [],
+  "identity": {
+    "type": "service_identity",
+    "principal": "svc-legacy-faq"
+  },
+  "evaluation": {
+    "last_run": "2026-06-01",
+    "result": "pass",
+    "suite": "faq-v1"
+  },
+  "review": {
+    "last_review": "2026-06-01",
+    "next_review": "2026-12-01"
+  },
+  "cost_tags": {
+    "Application": "legacy-faq",
+    "ApplicationOwner": "Group-Benefits",
+    "Environment": "production",
+    "CostCenter": "CC-150"
+  }
+}

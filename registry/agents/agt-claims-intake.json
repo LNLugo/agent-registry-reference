@@ -1,0 +1,63 @@
+{
+  "environment": "production",
+  "status": "approved",
+  "accountable_executive": {
+    "name": "Dana Whitfield",
+    "email": "dana.whitfield@example.com"
+  },
+  "prompt_version": "v7",
+  "exceptions": [],
+  "registered_on": "2026-06-01",
+  "agent_id": "agt-claims-intake",
+  "name": "Claims Intake Triage",
+  "purpose": "Classifies incoming claim documents, extracts key fields and routes the claim to the right queue.",
+  "platform": "aws-agentcore",
+  "platform_ref": "arn:aws:bedrock-agentcore:us-east-1:111122223333:runtime/claims-intake",
+  "business_owner": {
+    "name": "Tom Alvarez",
+    "email": "tom.alvarez@example.com"
+  },
+  "technical_owner": {
+    "name": "Raj Patel",
+    "email": "raj.patel@example.com"
+  },
+  "risk_tier": "high",
+  "autonomy_level": "act",
+  "data_classification": "restricted",
+  "models": [
+    {
+      "provider": "anthropic",
+      "model": "claude-haiku",
+      "version": "2026-03"
+    }
+  ],
+  "tools": [
+    {
+      "name": "route_claim",
+      "access": "write",
+      "mcp_server": "mcp-claims"
+    }
+  ],
+  "identity": {
+    "type": "service_identity",
+    "principal": "agentcore-identity/claims-intake"
+  },
+  "evaluation": {
+    "last_run": "2026-08-30",
+    "result": "pass",
+    "suite": "claims-routing-v3"
+  },
+  "review": {
+    "last_review": "2026-08-01",
+    "next_review": "2026-11-30",
+    "governance_forum": "AI Governance Committee"
+  },
+  "cost_tags": {
+    "Application": "claims-intake",
+    "ApplicationOwner": "Claims-Ops",
+    "Environment": "production",
+    "CostCenter": "CC-330",
+    "Model": "Claude-Haiku",
+    "Project": "Claims-Automation"
+  }
+}

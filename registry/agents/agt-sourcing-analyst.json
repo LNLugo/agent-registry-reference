@@ -1,0 +1,59 @@
+{
+  "environment": "production",
+  "status": "suspended",
+  "accountable_executive": {
+    "name": "Dana Whitfield",
+    "email": "dana.whitfield@example.com"
+  },
+  "prompt_version": "v1",
+  "exceptions": [],
+  "registered_on": "2026-06-01",
+  "agent_id": "agt-sourcing-analyst",
+  "name": "Sourcing Analyst",
+  "purpose": "Prepares sourcing strategies by combining spend data, contracts and meeting notes.",
+  "platform": "in-house",
+  "platform_ref": "langgraph-sourcing-analyst",
+  "business_owner": {
+    "name": "Omar Haddad",
+    "email": "omar.haddad@example.com"
+  },
+  "technical_owner": {
+    "name": "Raj Patel",
+    "email": "raj.patel@example.com"
+  },
+  "risk_tier": "medium",
+  "autonomy_level": "assist",
+  "data_classification": "confidential",
+  "models": [
+    {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "version": "2025-04"
+    }
+  ],
+  "tools": [
+    {
+      "name": "spend_cube_query",
+      "access": "read"
+    }
+  ],
+  "identity": {
+    "type": "service_identity",
+    "principal": "svc-sourcing-analyst"
+  },
+  "evaluation": {
+    "last_run": "2026-09-01",
+    "result": "fail",
+    "suite": "sourcing-v2"
+  },
+  "review": {
+    "last_review": "2026-09-05",
+    "next_review": "2026-12-05"
+  },
+  "cost_tags": {
+    "Application": "sourcing-analyst",
+    "ApplicationOwner": "Procurement-Tech",
+    "Environment": "production",
+    "CostCenter": "CC-520"
+  }
+}

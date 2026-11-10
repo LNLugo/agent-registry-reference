@@ -1,0 +1,20 @@
+[
+  {
+    "name": "advisor-assist",
+    "runtime_arn": "arn:aws:bedrock-agentcore:us-east-1:111122223333:runtime/advisor-assist",
+    "account": "111122223333",
+    "first_seen": "2026-06-02"
+  },
+  {
+    "name": "claims-intake",
+    "runtime_arn": "arn:aws:bedrock-agentcore:us-east-1:111122223333:runtime/claims-intake",
+    "account": "111122223333",
+    "first_seen": "2026-06-10"
+  },
+  {
+    "name": "underwriting-notes-summarizer",
+    "runtime_arn": "arn:aws:bedrock-agentcore:us-east-1:444455556666:runtime/uw-notes",
+    "account": "444455556666",
+    "first_seen": "2026-10-22"
+  }
+]

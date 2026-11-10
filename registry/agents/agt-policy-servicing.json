@@ -1,0 +1,61 @@
+{
+  "environment": "production",
+  "status": "approved",
+  "accountable_executive": {
+    "name": "Dana Whitfield",
+    "email": "dana.whitfield@example.com"
+  },
+  "prompt_version": "v1",
+  "exceptions": [],
+  "registered_on": "2026-06-01",
+  "agent_id": "agt-policy-servicing",
+  "name": "Policy Servicing Agent",
+  "purpose": "Processes routine policy service requests such as address and beneficiary changes, with QA sampling.",
+  "platform": "vendor-saas",
+  "vendor": "Example Automation Vendor",
+  "platform_ref": "vendor-agent-ps-01",
+  "business_owner": {
+    "name": "Grace Kim",
+    "email": "grace.kim@example.com"
+  },
+  "technical_owner": {
+    "name": "Chris Dunn",
+    "email": "chris.dunn@example.com"
+  },
+  "risk_tier": "high",
+  "autonomy_level": "act",
+  "data_classification": "restricted",
+  "models": [
+    {
+      "provider": "vendor",
+      "model": "vendor-managed",
+      "version": "vendor-managed"
+    }
+  ],
+  "tools": [
+    {
+      "name": "policy_admin_update",
+      "access": "write"
+    }
+  ],
+  "identity": {
+    "type": "service_identity",
+    "principal": "vendor-svc-ps01"
+  },
+  "evaluation": {
+    "last_run": "2026-10-20",
+    "result": "pass",
+    "suite": "vendor-qa-sample-oct"
+  },
+  "review": {
+    "last_review": "2026-10-01",
+    "next_review": "2027-01-01",
+    "governance_forum": "AI Governance Committee"
+  },
+  "cost_tags": {
+    "Application": "policy-servicing",
+    "ApplicationOwner": "Individual-Life-Ops",
+    "Environment": "production",
+    "CostCenter": "CC-350"
+  }
+}

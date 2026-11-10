@@ -1,0 +1,5 @@
+month,Application,ApplicationOwner,CostCenter,Model,cost_usd
+2026-10,advisor-assist,Advisor-Platforms,CC-210,Claude-Sonnet,18420.55
+2026-10,claims-intake,Claims-Ops,CC-330,Claude-Haiku,6210.10
+2026-10,marketing-genai,,,Claude-Sonnet,3975.00
+2026-10,uw-notes,Underwriting,CC-360,Claude-Haiku,1120.40
