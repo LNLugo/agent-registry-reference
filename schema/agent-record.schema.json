@@ -299,6 +299,130 @@
     "platform_ref": {
       "type": "string",
       "description": "The platform's own identifier for the agent (AgentCore runtime ARN, Copilot Studio bot ID, Agentforce API name). Used to reconcile discovered agents against the registry."
+    },
+    "risk_factors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_scope",
+        "customer_impact"
+      ],
+      "description": "Inputs to the computed risk tier, together with autonomy_level and data_classification. See docs/adr/0005-behavioral-contract.md.",
+      "properties": {
+        "action_scope": {
+          "enum": [
+            "read_only",
+            "write_internal",
+            "write_external",
+            "financial_binding"
+          ],
+          "description": "The most consequential thing the agent can do with its granted permissions. write_external means customers or third parties see the change. financial_binding means it moves money, changes a policy or beneficiary, or commits the firm."
+        },
+        "customer_impact": {
+          "enum": [
+            "internal_only",
+            "customer_facing",
+            "decides_on_customers"
+          ],
+          "description": "decides_on_customers means the output drives an eligibility, pricing, claims or servicing decision about a customer."
+        }
+      }
+    },
+    "behavioral_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "permitted_intents",
+        "constraints",
+        "contract_scan",
+        "runtime_guardrail",
+        "tool_vetting"
+      ],
+      "description": "What the agent is for and what it must never do, after the AI Registry in Uber's Secure AI design. Access control says who may act; the contract says whether a proposed action is in scope.",
+      "properties": {
+        "persona": {
+          "type": "string"
+        },
+        "permitted_intents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 3
+          },
+          "description": "Tasks the agent may perform, in business terms."
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 3
+          },
+          "description": "Hard limits that hold even where access would allow the action."
+        },
+        "calls_agents": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^agt-[a-z0-9-]{3,48}$"
+          },
+          "description": "Registry IDs of agents this agent delegates to."
+        },
+        "contract_scan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "result",
+            "last_run"
+          ],
+          "description": "Latest comparison of declared intents against what code, prompts, configuration and tool paths show the agent can do.",
+          "properties": {
+            "result": {
+              "enum": [
+                "match",
+                "drift",
+                "not_run"
+              ]
+            },
+            "last_run": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            },
+            "undeclared_capabilities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "runtime_guardrail": {
+          "enum": [
+            "none",
+            "shadow",
+            "enforcing"
+          ],
+          "description": "shadow logs guardrail verdicts without blocking; enforcing blocks actions outside the intents and constraints."
+        },
+        "tool_vetting": {
+          "enum": [
+            "not_vetted",
+            "findings_open",
+            "vetted"
+          ],
+          "description": "Tools and MCP servers checked for poisoning and injection in their descriptions before connection."
+        },
+        "last_red_team": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        }
+      }
     }
   },
   "allOf": [
@@ -335,6 +459,20 @@
             ]
           }
         }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "approved"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "risk_factors"
+        ]
       }
     }
   ],

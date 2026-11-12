@@ -40,6 +40,9 @@ if ($opa) {
     Write-Host "`nopa not found, skipping policy tests. Install with: winget install open-policy-agent.opa" -ForegroundColor Yellow
 }
 
+Write-Host "`nExport registry data for the Agent Catalog" -ForegroundColor Cyan
+& $py -m agent_registry.cli export-catalog --as-of $AsOf
+
 Write-Host "`nGovernance report as of $AsOf" -ForegroundColor Cyan
 & $py -m agent_registry.cli report --as-of $AsOf
 Write-Host "(exit code 1 above means critical findings exist, which is expected with the sample data)"

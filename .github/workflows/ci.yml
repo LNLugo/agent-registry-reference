@@ -36,3 +36,8 @@ jobs:
         run: |
           agent-registry report --as-of 2026-11-10 || true
           git diff --exit-code reports/
+
+      - name: Catalog data is reproducible
+        run: |
+          agent-registry export-catalog --as-of 2026-11-10
+          git diff --exit-code docs/catalog/agents.json

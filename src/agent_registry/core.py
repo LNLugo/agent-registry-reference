@@ -22,6 +22,18 @@ EVAL_MAX_AGE_DAYS = {"high": 30, "medium": 90, "low": 180}
 DORMANT_DAYS = 60
 ACTIVE_STATUSES = {"approved"}
 
+# Computed risk tier. Four factors; two triggers make an agent high tier
+# whatever it scores. See docs/adr/0005-behavioral-contract.md.
+RISK_POINTS = {
+    "autonomy_level": {"assist": 1, "act_with_approval": 2, "act": 3},
+    "action_scope": {"read_only": 1, "write_internal": 2, "write_external": 3, "financial_binding": 4},
+    "data_classification": {"public": 1, "internal": 2, "confidential": 3, "restricted": 4},
+    "customer_impact": {"internal_only": 1, "customer_facing": 2, "decides_on_customers": 4},
+}
+TIER_THRESHOLDS = (("high", 11), ("medium", 7), ("low", 0))
+TIER_RANK = {"low": 0, "medium": 1, "high": 2}
+CONTRACT_SCAN_MAX_AGE_DAYS = {"high": 30, "medium": 90, "low": 180}
+
 
 @dataclass
 class Finding:
@@ -200,6 +212,88 @@ def lifecycle(records: list[dict], data_dir: Path, as_of: date) -> list[Finding]
                 findings.append(Finding("EXCEPTION_EXPIRED", "high", aid,
                                         f"Exception {ex['id']} expired {exp}: {ex['reason']}",
                                         f"Close it ({ex['remediation']}) or renew it with {ex['approved_by']}"))
+    return findings
+
+
+# ---------- risk tier: computed from factors, compared with the stored tier ----------
+
+def risk_score(record: dict) -> int | None:
+    """Sum of the four factor points (4 to 15), or None when risk_factors is missing."""
+    factors = record.get("risk_factors")
+    if not factors:
+        return None
+    values = {
+        "autonomy_level": record["autonomy_level"],
+        "data_classification": record["data_classification"],
+        **factors,
+    }
+    return sum(RISK_POINTS[k][v] for k, v in values.items())
+
+
+def computed_tier(record: dict) -> str | None:
+    score = risk_score(record)
+    if score is None:
+        return None
+    f = record["risk_factors"]
+    if f["action_scope"] == "financial_binding" or f["customer_impact"] == "decides_on_customers":
+        return "high"
+    return next(tier for tier, floor in TIER_THRESHOLDS if score >= floor)
+
+
+# ---------- behavioral contract: is the agent doing only what it was registered to do ----------
+
+def contract_checks(records: list[dict], as_of: date) -> list[Finding]:
+    """Access control says who may act. These checks ask whether the action is in scope."""
+    findings: list[Finding] = []
+    for r in records:
+        if r["status"] not in ACTIVE_STATUSES:
+            continue
+        aid, tier = r["agent_id"], r["risk_tier"]
+
+        computed = computed_tier(r)
+        if computed and TIER_RANK[computed] > TIER_RANK[tier]:
+            findings.append(Finding("TIER_UNDERSTATED", "high", aid,
+                                    f"Stored tier is {tier}; risk factors compute {computed} (score {risk_score(r)})",
+                                    f"Raise the tier to {computed} and apply its controls, or record the rationale as a time bound exception"))
+
+        c = r.get("behavioral_contract")
+        if not c or not c.get("permitted_intents"):
+            findings.append(Finding("NO_BEHAVIORAL_CONTRACT", "high" if tier == "high" else "medium", aid,
+                                    "No declared intents or constraints, so runtime checks have nothing to hold the agent to",
+                                    "Owner declares permitted intents and constraints; platform team reviews them"))
+            continue
+
+        scan = c["contract_scan"]
+        last = _d(scan["last_run"])
+        if scan["result"] == "drift":
+            undeclared = "; ".join(scan.get("undeclared_capabilities", [])) or "capabilities not listed"
+            severe = tier == "high" and r["autonomy_level"] == "act"
+            findings.append(Finding("CONTRACT_DRIFT", "critical" if severe else "high", aid,
+                                    f"Scan on {last} found capabilities the agent does not declare: {undeclared}",
+                                    "Remove the capability or declare it and re-review the tier; until then block the tool at the gateway"))
+        elif tier != "low":
+            max_age = CONTRACT_SCAN_MAX_AGE_DAYS[tier]
+            if scan["result"] == "not_run" or last is None or (as_of - last).days > max_age:
+                age = "never run" if last is None or scan["result"] == "not_run" else f"{(as_of - last).days} days old"
+                findings.append(Finding("CONTRACT_NOT_VERIFIED", "medium", aid,
+                                        f"Contract scan {age}; limit for {tier} tier is {max_age} days",
+                                        "Scan code, prompts, configuration and tool paths against the declared intents"))
+
+        if tier != "low" and c["runtime_guardrail"] != "enforcing":
+            findings.append(Finding("GUARDRAIL_NOT_ENFORCING", "high" if tier == "high" else "medium", aid,
+                                    f"Runtime guardrail is {c['runtime_guardrail']} on a {tier} tier agent",
+                                    "Replay recorded traffic against the guardrail, then move it from shadow to enforcing"))
+
+        if c["tool_vetting"] != "vetted":
+            writes = any(t["access"] == "write" for t in r["tools"])
+            findings.append(Finding("TOOLS_NOT_VETTED", "high" if writes else "medium", aid,
+                                    f"Tool vetting is {c['tool_vetting'].replace('_', ' ')}" + ("; the agent has write tools" if writes else ""),
+                                    "Inspect tool and MCP server descriptions for poisoning and injection, and close open findings"))
+
+        for callee in c.get("calls_agents", []):
+            if callee not in {x["agent_id"] for x in records}:
+                findings.append(Finding("UNKNOWN_DEPENDENCY", "high", aid, f"Delegates to {callee}, which is not in the registry",
+                                        "Register the called agent or remove the delegation"))
     return findings
 
 

@@ -3,7 +3,9 @@
     agent-registry validate          schema and ownership checks on registry/agents/*.json
     agent-registry reconcile         discovered agents, gateway traffic and spend vs the registry
     agent-registry lifecycle         owners who left, stale evals, overdue reviews, expired exceptions
+    agent-registry contract          computed tier, behavioral contract, contract scan, guardrail and tool vetting
     agent-registry export-opa        write policy/data.json for the gateway policy
+    agent-registry export-catalog    write docs/catalog/agents.json for the Agent Catalog page
     agent-registry report            all checks plus KPIs, written to reports/governance-report-<date>.md
 
 Use --as-of YYYY-MM-DD to make runs reproducible. Exit code is 1 when any
@@ -17,20 +19,20 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from .core import ROOT, lifecycle, load_registry, load_schema, reconcile, sort_findings, validate_records
-from .report import agent_kpis, opa_data, render_report
+from .core import ROOT, contract_checks, lifecycle, load_registry, load_schema, reconcile, sort_findings, validate_records
+from .report import agent_kpis, catalog_data, opa_data, render_report
 
 
 def _print(findings) -> None:
     if not findings:
         print("No findings.")
     for f in findings:
-        print(f"[{f.severity.upper():8}] {f.rule:22} {f.subject}\n           {f.detail}\n           -> {f.action}")
+        print(f"[{f.severity.upper():8}] {f.rule:24} {f.subject}\n           {f.detail}\n           -> {f.action}")
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="agent-registry")
-    ap.add_argument("command", choices=["validate", "reconcile", "lifecycle", "export-opa", "report"])
+    ap.add_argument("command", choices=["validate", "reconcile", "lifecycle", "contract", "export-opa", "export-catalog", "report"])
     ap.add_argument("--as-of", default=date.today().isoformat())
     ap.add_argument("--root", default=str(ROOT))
     ap.add_argument("--json", action="store_true", help="print findings as JSON")
@@ -47,6 +49,15 @@ def main(argv: list[str] | None = None) -> int:
         print(f"wrote {out.relative_to(root)}")
         return 0
 
+    if args.command == "export-catalog":
+        findings = sort_findings(validate_records(records, load_schema(root)) + reconcile(records, data, as_of)
+                                 + lifecycle(records, data, as_of) + contract_checks(records, as_of))
+        out = root / "docs" / "catalog" / "agents.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(catalog_data(records, findings, as_of), indent=2) + "\n")
+        print(f"wrote {out.relative_to(root)}")
+        return 0
+
     findings = []
     if args.command in ("validate", "report"):
         findings += validate_records(records, load_schema(root))
@@ -54,6 +65,8 @@ def main(argv: list[str] | None = None) -> int:
         findings += reconcile(records, data, as_of)
     if args.command in ("lifecycle", "report"):
         findings += lifecycle(records, data, as_of)
+    if args.command in ("contract", "report"):
+        findings += contract_checks(records, as_of)
     findings = sort_findings(findings)
 
     if args.command == "report":

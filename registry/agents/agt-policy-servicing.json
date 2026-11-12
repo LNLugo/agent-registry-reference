@@ -57,5 +57,32 @@
     "ApplicationOwner": "Individual-Life-Ops",
     "Environment": "production",
     "CostCenter": "CC-350"
+  },
+  "risk_factors": {
+    "action_scope": "financial_binding",
+    "customer_impact": "decides_on_customers"
+  },
+  "behavioral_contract": {
+    "persona": "Policyholder servicing representative",
+    "permitted_intents": [
+      "Process address changes",
+      "Process beneficiary changes on a signed request"
+    ],
+    "constraints": [
+      "No coverage, loan or surrender transactions",
+      "Identity and signature verified before any change",
+      "QA sampling on every change type"
+    ],
+    "calls_agents": [],
+    "contract_scan": {
+      "result": "drift",
+      "last_run": "2026-11-05",
+      "undeclared_capabilities": [
+        "policy_admin_update also accepts coverage amount changes and surrender requests"
+      ]
+    },
+    "runtime_guardrail": "enforcing",
+    "tool_vetting": "vetted",
+    "last_red_team": "2026-09-20"
   }
 }

@@ -174,6 +174,89 @@ records = [
     ),
 ]
 
+# Risk factors (used to compute the tier) and the behavioral contract: what each
+# agent is for, what it must never do, and the assurance state of that contract.
+# Shaped so the contract checks produce at least one finding of each type.
+RISK_FACTORS = {
+    "agt-advisor-assist": {"action_scope": "write_internal", "customer_impact": "customer_facing"},
+    "agt-claims-intake": {"action_scope": "write_internal", "customer_impact": "internal_only"},
+    "agt-hr-policy-qa": {"action_scope": "read_only", "customer_impact": "internal_only"},
+    "agt-wholesaler-recap": {"action_scope": "write_internal", "customer_impact": "internal_only"},
+    "agt-policy-servicing": {"action_scope": "financial_binding", "customer_impact": "decides_on_customers"},
+    "agt-sourcing-analyst": {"action_scope": "read_only", "customer_impact": "internal_only"},
+    "agt-legacy-faq": {"action_scope": "read_only", "customer_impact": "internal_only"},
+}
+
+CONTRACTS = {
+    "agt-advisor-assist": {
+        "persona": "Product specialist for financial advisors",
+        "permitted_intents": ["Answer advisor questions on products, quotes and forms with citations", "Look up quotes", "Request an illustration"],
+        "constraints": ["Cites approved content only", "Never gives a recommendation to an end client", "Illustration requests need advisor approval"],
+        "calls_agents": [],
+        "contract_scan": {"result": "match", "last_run": "2026-10-28", "undeclared_capabilities": []},
+        "runtime_guardrail": "enforcing",
+        "tool_vetting": "vetted",
+        "last_red_team": "2026-10-01",
+    },
+    "agt-claims-intake": {
+        "persona": "Claims intake clerk",
+        "permitted_intents": ["Classify claim documents", "Extract key fields", "Route the claim to the right queue"],
+        "constraints": ["Never denies, pays or reserves a claim", "Routes only to queues in the routing table"],
+        "calls_agents": [],
+        "contract_scan": {"result": "match", "last_run": "2026-09-15", "undeclared_capabilities": []},
+        "runtime_guardrail": "shadow",
+        "tool_vetting": "vetted",
+        "last_red_team": None,
+    },
+    "agt-hr-policy-qa": {
+        "persona": "HR policy librarian",
+        "permitted_intents": ["Answer HR policy questions from the published policy library"],
+        "constraints": ["Read only", "Refers personal cases to an HR partner"],
+        "calls_agents": [],
+        "contract_scan": {"result": "not_run", "last_run": None, "undeclared_capabilities": []},
+        "runtime_guardrail": "none",
+        "tool_vetting": "vetted",
+        "last_red_team": None,
+    },
+    "agt-wholesaler-recap": {
+        "persona": "Meeting note taker for wholesalers",
+        "permitted_intents": ["Draft meeting recaps", "Create follow up tasks in the CRM"],
+        "constraints": ["Writes activity and task records only, never opportunities or pricing"],
+        "calls_agents": [],
+        "contract_scan": {"result": "not_run", "last_run": None, "undeclared_capabilities": []},
+        "runtime_guardrail": "none",
+        "tool_vetting": "findings_open",
+        "last_red_team": None,
+    },
+    "agt-policy-servicing": {
+        "persona": "Policyholder servicing representative",
+        "permitted_intents": ["Process address changes", "Process beneficiary changes on a signed request"],
+        "constraints": ["No coverage, loan or surrender transactions", "Identity and signature verified before any change", "QA sampling on every change type"],
+        "calls_agents": [],
+        "contract_scan": {"result": "drift", "last_run": "2026-11-05",
+                          "undeclared_capabilities": ["policy_admin_update also accepts coverage amount changes and surrender requests"]},
+        "runtime_guardrail": "enforcing",
+        "tool_vetting": "vetted",
+        "last_red_team": "2026-09-20",
+    },
+    "agt-sourcing-analyst": {
+        "persona": "Procurement spend analyst",
+        "permitted_intents": ["Analyze spend from the spend cube", "Draft sourcing strategies"],
+        "constraints": ["Read only", "No supplier contact"],
+        "calls_agents": [],
+        "contract_scan": {"result": "not_run", "last_run": None, "undeclared_capabilities": []},
+        "runtime_guardrail": "none",
+        "tool_vetting": "vetted",
+        "last_red_team": None,
+    },
+    # agt-legacy-faq has no behavioral contract on purpose.
+}
+
+for r in records:
+    r["risk_factors"] = RISK_FACTORS[r["agent_id"]]
+    if r["agent_id"] in CONTRACTS:
+        r["behavioral_contract"] = CONTRACTS[r["agent_id"]]
+
 for r in records:
     (AGENTS / f"{r['agent_id']}.json").write_text(json.dumps(r, indent=2) + "\n")
 

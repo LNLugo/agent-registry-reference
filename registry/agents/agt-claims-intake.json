@@ -59,5 +59,30 @@
     "CostCenter": "CC-330",
     "Model": "Claude-Haiku",
     "Project": "Claims-Automation"
+  },
+  "risk_factors": {
+    "action_scope": "write_internal",
+    "customer_impact": "internal_only"
+  },
+  "behavioral_contract": {
+    "persona": "Claims intake clerk",
+    "permitted_intents": [
+      "Classify claim documents",
+      "Extract key fields",
+      "Route the claim to the right queue"
+    ],
+    "constraints": [
+      "Never denies, pays or reserves a claim",
+      "Routes only to queues in the routing table"
+    ],
+    "calls_agents": [],
+    "contract_scan": {
+      "result": "match",
+      "last_run": "2026-09-15",
+      "undeclared_capabilities": []
+    },
+    "runtime_guardrail": "shadow",
+    "tool_vetting": "vetted",
+    "last_red_team": null
   }
 }

@@ -64,5 +64,31 @@
     "CostCenter": "CC-210",
     "Model": "Claude-Sonnet",
     "Project": "Advisor-Intelligence"
+  },
+  "risk_factors": {
+    "action_scope": "write_internal",
+    "customer_impact": "customer_facing"
+  },
+  "behavioral_contract": {
+    "persona": "Product specialist for financial advisors",
+    "permitted_intents": [
+      "Answer advisor questions on products, quotes and forms with citations",
+      "Look up quotes",
+      "Request an illustration"
+    ],
+    "constraints": [
+      "Cites approved content only",
+      "Never gives a recommendation to an end client",
+      "Illustration requests need advisor approval"
+    ],
+    "calls_agents": [],
+    "contract_scan": {
+      "result": "match",
+      "last_run": "2026-10-28",
+      "undeclared_capabilities": []
+    },
+    "runtime_guardrail": "enforcing",
+    "tool_vetting": "vetted",
+    "last_red_team": "2026-10-01"
   }
 }

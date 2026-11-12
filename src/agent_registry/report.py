@@ -6,7 +6,7 @@ from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 
-from .core import EVAL_MAX_AGE_DAYS, Finding, load_jsonl, load_csv
+from .core import EVAL_MAX_AGE_DAYS, Finding, computed_tier, load_csv, load_jsonl, risk_score
 
 
 def _p95(values: list[int]) -> int:
@@ -55,11 +55,43 @@ def opa_data(records: list[dict]) -> dict:
                 "eval_last_run": r["evaluation"]["last_run"],
                 "eval_max_age_days": EVAL_MAX_AGE_DAYS[r["risk_tier"]],
                 "data_classification": r["data_classification"],
+                "runtime_guardrail": r.get("behavioral_contract", {}).get("runtime_guardrail", "none"),
                 "allowed_routes": ["llm-default"],
             }
             for r in records
         }
     }
+
+
+PLATFORM_BUILD_PATH = {
+    "aws-agentcore": "Engineering SDK",
+    "in-house": "Engineering SDK",
+    "copilot-studio": "No code builder",
+    "agentforce": "Vendor embedded",
+    "vendor-saas": "Vendor embedded",
+}
+
+
+def catalog_data(records: list[dict], findings: list[Finding], as_of: date) -> dict:
+    """Registry records plus computed tier and open findings, for the Agent Catalog page."""
+    by_subject: dict[str, list[dict]] = defaultdict(list)
+    for f in findings:
+        by_subject[f.subject].append({"rule": f.rule, "severity": f.severity, "detail": f.detail, "action": f.action})
+    ids = {r["agent_id"] for r in records}
+    agents = []
+    for r in records:
+        agents.append({
+            **r,
+            "build_path": PLATFORM_BUILD_PATH[r["platform"]],
+            "risk_score": risk_score(r),
+            "computed_tier": computed_tier(r),
+            "findings": by_subject.get(r["agent_id"], []),
+        })
+    discovered = [
+        {"subject": f.subject, "detail": f.detail, "action": f.action}
+        for f in findings if f.rule == "UNREGISTERED_AGENT" and f.subject not in ids
+    ]
+    return {"as_of": as_of.isoformat(), "agents": agents, "discovered": discovered}
 
 
 def _pct(n: int, d: int) -> str:
@@ -80,6 +112,7 @@ def render_report(records: list[dict], findings: list[Finding], kpis: dict[str, 
     eval_bad = {f.subject for f in findings if f.rule in ("EVAL_STALE", "EVAL_FAILING")}
     review_bad = {f.subject for f in findings if f.rule == "REVIEW_OVERDUE"}
     unregistered = [f for f in findings if f.rule in ("UNREGISTERED_AGENT", "UNREGISTERED_CALLER")]
+    no_contract = {f.subject for f in findings if f.rule == "NO_BEHAVIORAL_CONTRACT"}
     open_exc = [(r["agent_id"], e) for r in records for e in r.get("exceptions", [])]
 
     lines: list[str] = []
@@ -97,7 +130,13 @@ def render_report(records: list[dict], findings: list[Finding], kpis: dict[str, 
     a(f"| Approved agents with an active business and technical owner | {_pct(len([r for r in active if r['agent_id'] not in orphan_ids]), len(active))} |")
     a(f"| Approved agents with a current, passing evaluation | {_pct(len([r for r in active if r['agent_id'] not in eval_bad]), len(active))} |")
     a(f"| Approved agents with review up to date | {_pct(len([r for r in active if r['agent_id'] not in review_bad]), len(active))} |")
+    a(f"| Approved agents with a declared behavioral contract | {_pct(len([r for r in active if r['agent_id'] not in no_contract]), len(active))} |")
+    a(f"| Approved agents whose contract matches the latest scan | {_pct(len([r for r in active if r.get('behavioral_contract', {}).get('contract_scan', {}).get('result') == 'match']), len(active))} |")
     a(f"| Unregistered agents or callers discovered | {len(unregistered)} |")
+    tracked = [r["agent_id"] for r in records if r["status"] != "retired"]
+    discovered = [f for f in findings if f.rule == "UNREGISTERED_AGENT"]
+    tangled = len([aid for aid in tracked if aid in flagged]) + len(discovered)
+    a(f"| Hairball quotient (registered or discovered agents with any open finding) | {_pct(tangled, len(tracked) + len(discovered))} |")
     a(f"| Exceptions on record | {len(open_exc)}, of which expired {by_rule['EXCEPTION_EXPIRED']} |")
     a(f"| Findings by severity | critical {by_sev['critical']}, high {by_sev['high']}, medium {by_sev['medium']}, low {by_sev['low']} |")
     a("")
@@ -114,6 +153,21 @@ def render_report(records: list[dict], findings: list[Finding], kpis: dict[str, 
     a("|---|---|---|---|---|")
     for f in findings:
         a(f"| {f.severity} | {f.rule} | {f.subject} | {f.detail} | {f.action} |")
+    a("")
+    a("## Behavioral contract")
+    a("")
+    a("Access control says who may act; the contract says whether an action is in scope. Tier is computed from autonomy, action scope, data class and customer impact, and compared with the stored tier.")
+    a("")
+    a("| Agent | Stored tier | Computed tier (score) | Intents | Contract scan | Runtime guardrail | Tool vetting |")
+    a("|---|---|---|---|---|---|---|")
+    for r in active:
+        c = r.get("behavioral_contract")
+        comp = computed_tier(r)
+        computed = f"{comp} ({risk_score(r)})" if comp else "no risk factors"
+        if c:
+            a(f"| {r['agent_id']} | {r['risk_tier']} | {computed} | {len(c['permitted_intents'])} | {c['contract_scan']['result']} | {c['runtime_guardrail']} | {c['tool_vetting'].replace('_', ' ')} |")
+        else:
+            a(f"| {r['agent_id']} | {r['risk_tier']} | {computed} | none declared | n/a | n/a | n/a |")
     a("")
     a("## Runtime behavior by agent (last 30 days)")
     a("")

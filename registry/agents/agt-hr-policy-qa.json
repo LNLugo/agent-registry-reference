@@ -63,5 +63,28 @@
     "ApplicationOwner": "HR-Technology",
     "Environment": "production",
     "CostCenter": "CC-120"
+  },
+  "risk_factors": {
+    "action_scope": "read_only",
+    "customer_impact": "internal_only"
+  },
+  "behavioral_contract": {
+    "persona": "HR policy librarian",
+    "permitted_intents": [
+      "Answer HR policy questions from the published policy library"
+    ],
+    "constraints": [
+      "Read only",
+      "Refers personal cases to an HR partner"
+    ],
+    "calls_agents": [],
+    "contract_scan": {
+      "result": "not_run",
+      "last_run": null,
+      "undeclared_capabilities": []
+    },
+    "runtime_guardrail": "none",
+    "tool_vetting": "vetted",
+    "last_red_team": null
   }
 }
