@@ -14,5 +14,9 @@ How the registry checks support common model risk and AI management frameworks. 
 | Identity hygiene | `PERSONAL_CREDENTIALS` | Controls over model use | MANAGE 2 | Information security controls |
 | Retirement | `DORMANT`, `retired` status | Model decommissioning in inventory | MANAGE 4 | AI system life cycle |
 | Third party agents | vendor inventory reconciliation | Vendor and third party models are in scope | GOVERN 6 (third party risk) | Supplier relationships |
+| Risk tier derived from documented factors | `TIER_UNDERSTATED` | Risk rating based on use and impact | MAP 1.1, MAP 5.1 (context, likelihood and impact) | AI risk assessment (6.1.2), impact assessment (A.5) |
+| Intended use declared and checked | `NO_BEHAVIORAL_CONTRACT`, `CONTRACT_DRIFT`, `CONTRACT_NOT_VERIFIED` | Model use within documented purpose and limitations | MAP 1.1 (intended purpose), MEASURE 2.7 (security and resilience) | Intended use (A.9.4), verification and validation (A.6.2.4) |
+| Runtime behavioral enforcement | `GUARDRAIL_NOT_ENFORCING`, gateway guardrail rule | Controls over model use and ongoing monitoring | MANAGE 2.2, MANAGE 2.4 (disengage or deactivate) | Operation and monitoring (A.6.2.6) |
+| Tool and MCP supply chain | `TOOLS_NOT_VETTED`, `UNKNOWN_DEPENDENCY` | Vendor and third party components in scope | GOVERN 6.1, MAP 4.1 (third party components) | Suppliers (A.10.3), resource documentation (A.4.2) |
 
 For insurers, state insurance guidance on AI use (for example NYDFS Insurance Circular Letter No. 7 of 2024) expects a governance and risk management framework and oversight of third party AI systems; the inventory, ownership, vendor and reporting checks above are the operational evidence for that framework.

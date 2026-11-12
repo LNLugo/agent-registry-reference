@@ -55,5 +55,29 @@
     "ApplicationOwner": "Procurement-Tech",
     "Environment": "production",
     "CostCenter": "CC-520"
+  },
+  "risk_factors": {
+    "action_scope": "read_only",
+    "customer_impact": "internal_only"
+  },
+  "behavioral_contract": {
+    "persona": "Procurement spend analyst",
+    "permitted_intents": [
+      "Analyze spend from the spend cube",
+      "Draft sourcing strategies"
+    ],
+    "constraints": [
+      "Read only",
+      "No supplier contact"
+    ],
+    "calls_agents": [],
+    "contract_scan": {
+      "result": "not_run",
+      "last_run": null,
+      "undeclared_capabilities": []
+    },
+    "runtime_guardrail": "none",
+    "tool_vetting": "vetted",
+    "last_red_team": null
   }
 }

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-registry-reference"
-version = "0.1.0"
+version = "0.2.0"
 description = "Reference implementation of an enterprise AI agent registry with reconciliation, gateway enforcement and governance reporting"
 requires-python = ">=3.10"
 license = { text = "MIT" }

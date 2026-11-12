@@ -52,6 +52,14 @@ reasons contains sprintf("evaluation is %d days old, limit for %s tier is %d", [
 	age > agent.eval_max_age_days
 }
 
+reasons contains sprintf("high tier agent needs an enforcing runtime guardrail, registry says %s", [guardrail]) if {
+	agent.risk_tier == "high"
+	guardrail != "enforcing"
+}
+
+# A record without the field fails closed for high tier agents.
+guardrail := object.get(agent, "runtime_guardrail", "none")
+
 eval_age_days := floor((day_ns(input.request.date) - day_ns(agent.eval_last_run)) / (((24 * 60) * 60) * 1000000000))
 
 day_ns(d) := time.parse_rfc3339_ns(concat("", [d, "T00:00:00Z"]))

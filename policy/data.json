@@ -8,6 +8,7 @@
       "eval_last_run": "2026-10-28",
       "eval_max_age_days": 30,
       "data_classification": "confidential",
+      "runtime_guardrail": "enforcing",
       "allowed_routes": [
         "llm-default"
       ]
@@ -20,6 +21,7 @@
       "eval_last_run": "2026-08-30",
       "eval_max_age_days": 30,
       "data_classification": "restricted",
+      "runtime_guardrail": "shadow",
       "allowed_routes": [
         "llm-default"
       ]
@@ -32,6 +34,7 @@
       "eval_last_run": "2026-07-20",
       "eval_max_age_days": 180,
       "data_classification": "internal",
+      "runtime_guardrail": "none",
       "allowed_routes": [
         "llm-default"
       ]
@@ -44,6 +47,7 @@
       "eval_last_run": "2026-06-01",
       "eval_max_age_days": 180,
       "data_classification": "internal",
+      "runtime_guardrail": "none",
       "allowed_routes": [
         "llm-default"
       ]
@@ -56,6 +60,7 @@
       "eval_last_run": "2026-10-20",
       "eval_max_age_days": 30,
       "data_classification": "restricted",
+      "runtime_guardrail": "enforcing",
       "allowed_routes": [
         "llm-default"
       ]
@@ -68,6 +73,7 @@
       "eval_last_run": "2026-09-01",
       "eval_max_age_days": 90,
       "data_classification": "confidential",
+      "runtime_guardrail": "none",
       "allowed_routes": [
         "llm-default"
       ]
@@ -80,6 +86,7 @@
       "eval_last_run": "2026-09-10",
       "eval_max_age_days": 90,
       "data_classification": "confidential",
+      "runtime_guardrail": "none",
       "allowed_routes": [
         "llm-default"
       ]

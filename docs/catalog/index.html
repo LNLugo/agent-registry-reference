@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14213a; --ink2:#4a5672; --ink3:#7b869c; --line:#e3e7ee; --bg:#f6f7f9; --card:#fff;
+  --navy:#1f3a5f; --teal:#1f7a74; --teal-bg:#e3f2f0; --amber:#b7791f; --amber-bg:#fdf3e1;
+  --red:#b42318; --red-bg:#fdecea; --green:#1e7a3c; --green-bg:#e6f4ea; --gray-bg:#eef0f4;
+  --r:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"IBM Plex Sans",system-ui,sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.45}
+.mono{font-family:"IBM Plex Mono",monospace}
+header{background:var(--navy);color:#fff;padding:20px 24px 0}
+.hwrap{max-width:1180px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font-size:22px;margin:0;font-weight:700;letter-spacing:-.01em}
+.sub{color:#c8d3e6;font-size:13px;margin:4px 0 14px}
+.tabs{display:flex;gap:4px;overflow-x:auto}
+.tab{background:none;border:0;color:#c8d3e6;font:inherit;font-weight:500;padding:10px 14px;border-radius:8px 8px 0 0;cursor:pointer;white-space:nowrap}
+.tab.on{background:var(--bg);color:var(--ink)}
+.tab .n{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:10px;background:rgba(255,255,255,.18);font-size:12px}
+.tab.on .n{background:var(--gray-bg)}
+main{max-width:1180px;margin:0 auto;padding:18px 24px 60px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.search{flex:1 1 260px;position:relative}
+.search input{width:100%;padding:10px 12px 10px 36px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
+.search svg{position:absolute;left:11px;top:11px;color:var(--ink3)}
+select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+.note{background:#fff;border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:8px;padding:10px 14px;color:var(--ink2);margin-bottom:16px;font-size:13px}
+.note.warn{border-left-color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s,border-color .15s}
+.card:hover,.card:focus-visible{border-color:#b9c3d4;box-shadow:0 4px 14px rgba(20,33,58,.08);outline:none}
+.ctop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.cname{font-weight:600;font-size:15px}
+.cid{color:var(--ink3);font-size:12px}
+.purpose{color:var(--ink2);font-size:13px;flex:1}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:2px 8px;border-radius:999px;background:var(--gray-bg);color:var(--ink2);white-space:nowrap}
+.t1{background:var(--red-bg);color:var(--red)} .t2{background:var(--amber-bg);color:var(--amber)} .t3{background:var(--green-bg);color:var(--green)}
+.prod{background:var(--teal-bg);color:var(--teal)} .draft{background:#ece8f8;color:#5b3fa8}
+.checks{display:flex;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px;font-size:12px;color:var(--ink2)}
+.ck{display:inline-flex;align-items:center;gap:4px}
+.dot{width:8px;height:8px;border-radius:50%}
+.ok{background:var(--green)} .bad{background:var(--red)} .mid{background:var(--amber)}
+.owner{font-size:12px;color:var(--ink3)}
+.empty{text-align:center;color:var(--ink3);padding:50px 10px;background:#fff;border:1px dashed var(--line);border-radius:var(--r)}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(20,33,58,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(560px,100%);background:#fff;z-index:11;transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(20,33,58,.15)}
+.drawer.on{transform:none}
+.dhead{padding:18px 20px 14px;border-bottom:1px solid var(--line)}
+.dhead h2{margin:4px 0 6px;font-size:19px}
+.x{float:right;background:none;border:0;font-size:22px;line-height:1;cursor:pointer;color:var(--ink3);padding:4px}
+.dbody{padding:16px 20px;overflow-y:auto;flex:1}
+.dfoot{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;background:#fbfcfd}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin:18px 0 8px;font-weight:600}
+h3:first-child{margin-top:0}
+ul.l{margin:0;padding-left:18px} ul.l li{margin:3px 0}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:13px}
+.kv dt{color:var(--ink3)} .kv dd{margin:0}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:13px;align-items:center}
+.ctl .st{font-weight:500;font-size:12px}
+.st.ok2{color:var(--green)} .st.bad2{color:var(--red)} .st.mid2{color:var(--amber)}
+.btn{font:inherit;font-weight:600;border-radius:8px;padding:10px 16px;cursor:pointer;border:1px solid var(--navy);background:var(--navy);color:#fff}
+.btn.sec{background:#fff;color:var(--navy)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.why{font-size:12px;color:var(--ink3);flex-basis:100%}
+.lineage{font-size:12px;color:#5b3fa8;margin-top:2px}
+/* modal */
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.modal.on{display:flex}
+.mbox{background:#fff;border-radius:12px;width:min(620px,100%);max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(20,33,58,.3)}
+.mbox .dhead{position:sticky;top:0;background:#fff;z-index:1}
+label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:12px 0 4px}
+input[type=text],textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font:inherit}
+textarea{min-height:64px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.row2 select{width:100%}
+.risk{margin-top:14px;padding:12px 14px;border-radius:8px;background:var(--gray-bg);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.risk b{font-size:20px}
+.err{color:var(--red);font-size:12px;margin-top:4px;display:none}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 16px;border-radius:8px;opacity:0;transition:.25s;z-index:30;max-width:90%;font-size:13px}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.sev{font-size:11px;font-weight:600;text-transform:uppercase;padding:1px 6px;border-radius:4px;margin-right:6px}.sev.critical,.sev.high{background:var(--red-bg);color:var(--red)}.sev.medium{background:var(--amber-bg);color:var(--amber)}.sev.low{background:var(--gray-bg);color:var(--ink2)}.find{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px}.find .act{color:var(--ink3);font-size:12px;margin-top:3px}.legend{font-size:12px;color:var(--ink3);margin-top:22px}
+@media (max-width:600px){
+  header{padding:16px 16px 0} main{padding:14px 16px 50px}
+  .grid{grid-template-columns:1fr}
+  .kv{grid-template-columns:110px 1fr}
+  .row2{grid-template-columns:1fr}
+  select{flex:1 1 45%}
+}
+</style>
+</head>
+<body>
+<header><div class="hwrap">
+  <div class="brand"><h1>Agent Catalog</h1><span class="sub" style="margin:0" id="asof"></span></div>
+  <p class="sub">Find an approved agent, use it, or copy it as a starting point. Every card shows the open findings from <span class="mono">agent-registry</span> for that agent.</p>
+  <nav class="tabs" role="tablist">
+    <button class="tab on" data-tab="catalog" role="tab">Catalog <span class="n" id="n-catalog"></span></button>
+    <button class="tab" data-tab="review" role="tab">Needs review <span class="n" id="n-review"></span></button>
+    <button class="tab" data-tab="drafts" role="tab">My drafts <span class="n" id="n-drafts"></span></button>
+  </nav>
+</div></header>
+<main>
+  <div class="bar">
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search by name, purpose, intent or owner" aria-label="Search agents">
+    </div>
+    <select id="f-tier" aria-label="Risk tier"><option value="">All tiers</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+    <select id="f-path" aria-label="Build path"><option value="">All build paths</option><option>Engineering SDK</option><option>No code builder</option><option>Vendor embedded</option></select>
+    <select id="f-plat" aria-label="Platform"><option value="">All platforms</option></select>
+  </div>
+  <div id="note"></div>
+  <div class="grid" id="grid"></div>
+  <p class="legend">All data is synthetic. Controls on each card: <b>Owner</b> both owners active · <b>Eval</b> current and passing · <b>Review</b> not overdue · <b>Contract</b> intents declared and the latest scan matches. Regenerate the data with <span class="mono">agent-registry export-catalog</span>.</p>
+</main>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-label="Agent details">
+  <div class="dhead" id="dhead"></div><div class="dbody" id="dbody"></div><div class="dfoot" id="dfoot"></div>
+</aside>
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mbox" id="mbox"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+// Same model as agent_registry.core: RISK_POINTS, TIER_THRESHOLDS and the two high tier triggers.
+const POINTS={
+  autonomy_level:{assist:1,act_with_approval:2,act:3},
+  action_scope:{read_only:1,write_internal:2,write_external:3,financial_binding:4},
+  data_classification:{public:1,internal:2,confidential:3,restricted:4},
+  customer_impact:{internal_only:1,customer_facing:2,decides_on_customers:4}};
+const LABEL={assist:"Assist",act_with_approval:"Act with approval",act:"Act",read_only:"Read only",write_internal:"Write internal",
+  write_external:"Write external",financial_binding:"Financial / binding",public:"Public",internal:"Internal",confidential:"Confidential",
+  restricted:"Restricted",internal_only:"Internal only",customer_facing:"Customer facing",decides_on_customers:"Decides on customers"};
+function score(f){return POINTS.autonomy_level[f.autonomy_level]+POINTS.action_scope[f.action_scope]+POINTS.data_classification[f.data_classification]+POINTS.customer_impact[f.customer_impact]}
+function tierOf(f){if(f.action_scope==="financial_binding"||f.customer_impact==="decides_on_customers")return"high";const s=score(f);return s>=11?"high":s>=7?"medium":"low"}
+const tcls=t=>t==="high"?"t1":t==="medium"?"t2":"t3", cap=s=>s?s[0].toUpperCase()+s.slice(1):"";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let agents=[],discovered=[],drafts=[],tab="catalog",current=null,nextDraft=1;
+
+const has=(a,pred)=>a.findings.some(f=>pred(f.rule));
+function checks(a){
+  const c=a.behavioral_contract;
+  return[
+   {k:"Owner",ok:!has(a,r=>r.startsWith("ORPHANED")||r==="SINGLE_OWNER")},
+   {k:"Eval",ok:!has(a,r=>r.startsWith("EVAL_"))},
+   {k:"Review",ok:!has(a,r=>r==="REVIEW_OVERDUE")},
+   {k:"Contract",ok:!!c&&c.contract_scan.result==="match"&&!has(a,r=>r==="CONTRACT_DRIFT"),mid:!!c&&c.contract_scan.result==="not_run"}];
+}
+function blockers(a){
+  const b=[];
+  if(a.status!=="approved")b.push(`status is ${a.status}`);
+  a.findings.filter(f=>f.severity==="critical"||f.severity==="high").forEach(f=>b.push(f.rule));
+  return b;
+}
+function card(a){
+  const ck=checks(a).map(c=>`<span class="ck"><span class="dot ${c.ok?"ok":c.mid?"mid":"bad"}"></span>${c.k}</span>`).join("");
+  const tierNote=a.computed_tier&&a.computed_tier!==a.risk_tier?` <span class="pill" title="Computed from risk factors">computes ${a.computed_tier}</span>`:"";
+  const open=a.findings.length?`<span class="pill" style="background:var(--red-bg);color:var(--red)">${a.findings.length} open finding${a.findings.length>1?"s":""}</span>`:"";
+  return `<article class="card" tabindex="0" data-id="${esc(a.agent_id)}">
+   <div class="ctop"><div><div class="cname">${esc(a.name)}</div><div class="cid mono">${esc(a.agent_id)}</div>${a.copiedFrom?`<div class="lineage">Copied from ${esc(a.copiedFrom)}</div>`:""}</div>
+   <span class="pill ${tcls(a.risk_tier)}">${cap(a.risk_tier)}</span></div>
+   <div class="purpose">${esc(a.purpose)}</div>
+   <div class="meta"><span class="pill ${a.status==="approved"?"prod":a.status==="draft"?"draft":""}">${cap(a.status)}</span><span class="pill">${esc(a.build_path)}</span>${tierNote}${open}</div>
+   <div class="owner">Owner: ${esc(a.business_owner.name)} · ${esc(a.platform)}</div>
+   <div class="checks">${ck}</div></article>`;
+}
+function discCard(d,i){
+  return `<article class="card" tabindex="0" data-disc="${i}"><div class="ctop"><div><div class="cname">${esc(d.subject)}</div><div class="cid mono">no registry record</div></div><span class="pill t1">Unregistered</span></div>
+   <div class="purpose">${esc(d.detail)}</div><div class="owner" style="color:var(--red);font-weight:600">No owner</div></article>`;
+}
+function filtered(list){
+  const q=$("#q").value.trim().toLowerCase(),t=$("#f-tier").value,p=$("#f-path").value,pl=$("#f-plat").value;
+  return list.filter(a=>(!t||a.risk_tier===t)&&(!p||a.build_path===p)&&(!pl||a.platform===pl)&&
+   (!q||[a.name,a.purpose,a.agent_id,a.business_owner.name,...(a.behavioral_contract?.permitted_intents||[])].join(" ").toLowerCase().includes(q)));
+}
+function render(){
+  const cat=agents.filter(a=>a.status==="approved"),rev=agents.filter(a=>a.status!=="approved"&&a.status!=="retired");
+  $("#n-catalog").textContent=cat.length;$("#n-review").textContent=rev.length+discovered.length;$("#n-drafts").textContent=drafts.length;
+  const notes={catalog:'<div class="note">Approved agents. Use is blocked while an agent has a critical or high finding. A copy inherits the contract, never the approval: new owner, computed tier, status draft.</div>',
+   review:'<div class="note warn">Agents that are suspended, or found by reconciliation (AgentCore, Microsoft and vendor inventories) with no registry record. They cannot be used or copied.</div>',
+   drafts:'<div class="note">Drafts you created by copying an agent. Each would enter intake as a draft record with no credentials until it passes its tier\'s gates.</div>'};
+  $("#note").innerHTML=notes[tab];
+  let h="";
+  if(tab==="review"){h=filtered(rev).map(card).join("")+(($("#q").value||$("#f-tier").value||$("#f-path").value||$("#f-plat").value)?"":discovered.map(discCard).join(""))}
+  else h=filtered(tab==="catalog"?cat:drafts).map(card).join("");
+  $("#grid").innerHTML=h||`<div class="empty" style="grid-column:1/-1">${tab==="drafts"?"No drafts yet. Open a catalog agent and choose <b>Copy and modify</b>.":"No agents match these filters."}</div>`;
+}
+const find=id=>agents.find(a=>a.agent_id===id)||drafts.find(a=>a.agent_id===id);
+function list(arr,empty){return arr&&arr.length?`<ul class="l">${arr.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<div style="color:var(--red)">${empty}</div>`}
+function openAgent(id){
+  const a=find(id);current=a;const c=a.behavioral_contract;
+  $("#dhead").innerHTML=`<button class="x" aria-label="Close" onclick="closeDrawer()">×</button><div class="cid mono">${esc(a.agent_id)}${a.copiedFrom?` · copied from ${esc(a.copiedFrom)}`:""}</div><h2>${esc(a.name)}</h2>
+   <div class="meta"><span class="pill ${tcls(a.risk_tier)}">${cap(a.risk_tier)} tier</span>${a.risk_score!=null?`<span class="pill">computed ${esc(a.computed_tier)} · score ${a.risk_score}</span>`:""}<span class="pill">${cap(a.status)}</span><span class="pill">${esc(a.build_path)}</span></div>`;
+  const row=(k,ok,label,mid)=>`<div>${k}</div><div class="st ${ok?"ok2":mid?"mid2":"bad2"}">${esc(label)}</div>`;
+  const tools=a.tools.map(t=>`${t.name} (${t.access}${t.mcp_server?", "+t.mcp_server:""})`);
+  const fx=a.findings.map(f=>`<div class="find"><span class="sev ${f.severity}">${f.severity}</span><b class="mono" style="font-size:12px">${esc(f.rule)}</b><div>${esc(f.detail)}</div><div class="act">→ ${esc(f.action)}</div></div>`).join("");
+  $("#dbody").innerHTML=`
+   <h3>What it does</h3><p style="margin:0">${esc(a.purpose)}</p>${c&&c.persona?`<p style="margin:6px 0 0;color:var(--ink3)">Persona: ${esc(c.persona)}</p>`:""}
+   <h3>Open findings</h3>${fx||'<div style="color:var(--green)">None</div>'}
+   <h3>Permitted intents</h3>${list(c?.permitted_intents,"None declared")}
+   <h3>Constraints</h3>${list(c?.constraints,"None declared")}
+   <h3>Tools</h3>${list(tools,"None")}
+   <h3>Contract assurance</h3><div class="ctl">${c?`
+    ${row("Contract scan",c.contract_scan.result==="match",c.contract_scan.result.replace("_"," ")+(c.contract_scan.last_run?` (${c.contract_scan.last_run})`:""),c.contract_scan.result==="not_run")}
+    ${row("Runtime guardrail",c.runtime_guardrail==="enforcing",c.runtime_guardrail,c.runtime_guardrail==="shadow")}
+    ${row("Tool vetting",c.tool_vetting==="vetted",c.tool_vetting.replace("_"," "),c.tool_vetting==="findings_open")}
+    ${row("Last red team",!!c.last_red_team,c.last_red_team||"none",a.risk_tier!=="high")}`:row("Behavioral contract",false,"Missing")}</div>
+   <h3>Risk factors</h3><dl class="kv"><dt>Autonomy</dt><dd>${LABEL[a.autonomy_level]}</dd><dt>Data class</dt><dd>${LABEL[a.data_classification]}</dd>
+    ${a.risk_factors?`<dt>Action scope</dt><dd>${LABEL[a.risk_factors.action_scope]}</dd><dt>Customer impact</dt><dd>${LABEL[a.risk_factors.customer_impact]}</dd>`:""}</dl>
+   <h3>Ownership and runtime</h3><dl class="kv"><dt>Business owner</dt><dd>${esc(a.business_owner.name)}</dd><dt>Technical owner</dt><dd>${esc(a.technical_owner.name)}</dd>
+    <dt>Accountable exec</dt><dd>${esc(a.accountable_executive.name)}</dd><dt>Platform</dt><dd>${esc(a.platform)}${a.vendor?" · "+esc(a.vendor):""}</dd>
+    <dt>Models</dt><dd>${a.models.map(m=>esc(m.provider+" "+m.model+" "+m.version)).join(", ")}</dd><dt>Identity</dt><dd>${esc(a.identity.type.replace("_"," "))}</dd>
+    <dt>Next review</dt><dd>${esc(a.review.next_review)}</dd></dl>`;
+  const b=blockers(a);
+  $("#dfoot").innerHTML=a.status==="draft"?`<button class="btn sec" onclick="discard()">Discard draft</button><span class="why">Next: intake and approval for a ${a.risk_tier} tier agent.</span>`
+   :a.status!=="approved"?`<span class="why">Status is ${esc(a.status)}. Use and copy are blocked.</span>`
+   :`<button class="btn" ${b.length?"disabled":""} onclick="useAgent()">Use this agent</button><button class="btn sec" onclick="copyAgent()">Copy and modify</button>
+    <span class="why">${b.length?"Use is blocked: "+esc(b.join(", "))+".":a.risk_tier==="high"?"High tier: the owner approves each new consumer.":"Calls carry your registry ID and pass the gateway policy."}</span>`;
+  openPanel();
+}
+function openDisc(i){
+  const d=discovered[i];current=null;
+  $("#dhead").innerHTML=`<button class="x" aria-label="Close" onclick="closeDrawer()">×</button><div class="cid mono">UNREGISTERED_AGENT</div><h2>${esc(d.subject)}</h2>`;
+  $("#dbody").innerHTML=`<h3>What reconciliation found</h3><p style="margin:0">${esc(d.detail)}</p><h3>Required action</h3><p style="margin:0">${esc(d.action)}</p>`;
+  $("#dfoot").innerHTML=`<span class="why">No registry record, so no owner, tier or contract. The gateway denies it until it is registered.</span>`;
+  openPanel();
+}
+function openPanel(){$("#drawer").classList.add("on");$("#scrim").classList.add("on");$("#drawer").setAttribute("aria-hidden","false")}
+function closeDrawer(){$("#drawer").classList.remove("on");$("#scrim").classList.remove("on");$("#drawer").setAttribute("aria-hidden","true")}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("on"),3200)}
+function openModal(h){$("#mbox").innerHTML=h;$("#modal").classList.add("on");setTimeout(()=>{const f=$("#mbox input,#mbox textarea");f&&f.focus()},30)}
+function closeModal(){$("#modal").classList.remove("on")}
+function useAgent(){
+  const a=current;
+  openModal(`<div class="dhead"><button class="x" onclick="closeModal()">×</button><h2 style="margin:0">Use ${esc(a.name)}</h2></div>
+   <div class="dbody"><p style="margin-top:0">Your calls carry the x-agent-id header and your identity, and the gateway checks them against this record.</p>
+   <label for="u-why">What will you use it for?</label><textarea id="u-why" placeholder="Must fit the permitted intents"></textarea><div class="err" id="u-err">Describe the use so the owner can check it against the intents.</div>
+   <h3 style="margin-top:14px">Permitted intents</h3>${list(a.behavioral_contract?.permitted_intents,"None declared")}</div>
+   <div class="dfoot"><button class="btn" onclick="submitUse()">Request access</button><button class="btn sec" onclick="closeModal()">Cancel</button></div>`);
+}
+function submitUse(){if(!$("#u-why").value.trim()){$("#u-err").style.display="block";return}closeModal();closeDrawer();
+  toast(current.risk_tier==="high"?`Request sent to ${current.business_owner.name} (demo).`:"Access granted for your role (demo).")}
+function opts(map,sel){return Object.keys(map).map(k=>`<option value="${k}" ${k===sel?"selected":""}>${LABEL[k]}</option>`).join("")}
+function copyAgent(){
+  const a=current,f=a.risk_factors||{action_scope:"read_only",customer_impact:"internal_only"},c=a.behavioral_contract||{permitted_intents:[],constraints:[]};
+  openModal(`<div class="dhead"><button class="x" onclick="closeModal()">×</button><div class="cid mono">Copy of ${esc(a.agent_id)}</div><h2 style="margin:4px 0 0">Copy and modify</h2></div>
+   <div class="dbody"><p style="margin-top:0;color:var(--ink2)">The copy keeps the contract as a starting point. It does not keep the approval, the owners or the credentials.</p>
+   <label for="c-name">Agent name</label><input type="text" id="c-name" value="${esc(a.name)} (copy)">
+   <div class="row2"><div><label for="c-owner">Business owner (required)</label><input type="text" id="c-owner" placeholder="One named person"><div class="err" id="c-err">Every agent needs a named business owner.</div></div>
+   <div><label for="c-tech">Technical owner (required, different person)</label><input type="text" id="c-tech"><div class="err" id="c-err2">Name a different technical owner (SINGLE_OWNER).</div></div></div>
+   <label for="c-int">Permitted intents (one per line)</label><textarea id="c-int">${esc(c.permitted_intents.join("\n"))}</textarea>
+   <label for="c-con">Constraints (one per line)</label><textarea id="c-con">${esc(c.constraints.join("\n"))}</textarea>
+   <div class="row2"><div><label for="c-aut">Autonomy</label><select id="c-aut">${opts(POINTS.autonomy_level,a.autonomy_level)}</select></div>
+   <div><label for="c-act">Action scope</label><select id="c-act">${opts(POINTS.action_scope,f.action_scope)}</select></div>
+   <div><label for="c-dat">Data classification</label><select id="c-dat">${opts(POINTS.data_classification,a.data_classification)}</select></div>
+   <div><label for="c-imp">Customer impact</label><select id="c-imp">${opts(POINTS.customer_impact,f.customer_impact)}</select></div></div>
+   <div class="risk" id="c-risk"></div></div>
+   <div class="dfoot"><button class="btn" onclick="saveCopy()">Create draft</button><button class="btn sec" onclick="closeModal()">Cancel</button></div>`);
+  ["c-aut","c-act","c-dat","c-imp"].forEach(i=>$("#"+i).addEventListener("change",calc));calc();
+}
+const form=()=>({autonomy_level:$("#c-aut").value,action_scope:$("#c-act").value,data_classification:$("#c-dat").value,customer_impact:$("#c-imp").value});
+function calc(){const f=form(),t=tierOf(f);
+  $("#c-risk").innerHTML=`<div>Risk score <b>${score(f)}</b> / 15</div><span class="pill ${tcls(t)}">${cap(t)} tier</span><div style="flex-basis:100%;font-size:12px;color:var(--ink2)">${t!==current.risk_tier?`Different from the original (${current.risk_tier}). Controls follow the new tier.`:"Same tier as the original. The copy still goes through intake."}</div>`}
+function saveCopy(){
+  const o=$("#c-owner").value.trim(),t=$("#c-tech").value.trim();
+  $("#c-err").style.display=o?"none":"block";$("#c-err2").style.display=(t&&t.toLowerCase()!==o.toLowerCase())?"none":"block";
+  if(!o||!t||t.toLowerCase()===o.toLowerCase())return;
+  const f=form(),src=current,lines=id=>$(id).value.split("\n").map(s=>s.trim()).filter(Boolean);
+  const d=JSON.parse(JSON.stringify(src));
+  Object.assign(d,{agent_id:`agt-draft-${nextDraft++}`,name:$("#c-name").value.trim()||src.name+" (copy)",status:"draft",copiedFrom:`${src.agent_id} ${src.name}`,
+   business_owner:{name:o,email:""},technical_owner:{name:t,email:""},autonomy_level:f.autonomy_level,data_classification:f.data_classification,
+   risk_factors:{action_scope:f.action_scope,customer_impact:f.customer_impact},findings:[]});
+  d.risk_score=score(f);d.computed_tier=d.risk_tier=tierOf(f);
+  d.behavioral_contract={...(src.behavioral_contract||{}),permitted_intents:lines("#c-int"),constraints:lines("#c-con"),
+   contract_scan:{result:"not_run",last_run:null,undeclared_capabilities:[]},runtime_guardrail:"none",last_red_team:null,tool_vetting:src.behavioral_contract?.tool_vetting||"not_vetted"};
+  drafts.unshift(d);closeModal();closeDrawer();switchTab("drafts");toast(`${d.agent_id} created as a draft record (demo). No credentials until approved.`);
+}
+function discard(){drafts=drafts.filter(d=>d!==current);closeDrawer();render();toast("Draft discarded.")}
+function switchTab(t){tab=t;document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));render()}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+["#q","#f-tier","#f-path","#f-plat"].forEach(s=>$(s).addEventListener("input",render));
+const open=e=>{const c=e.target.closest(".card");if(!c)return;c.dataset.disc!==undefined?openDisc(+c.dataset.disc):openAgent(c.dataset.id)};
+$("#grid").addEventListener("click",open);$("#grid").addEventListener("keydown",e=>{if(e.key==="Enter")open(e)});
+$("#scrim").addEventListener("click",closeDrawer);$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").classList.contains("on")?closeModal():closeDrawer()}});
+fetch("agents.json").then(r=>r.ok?r.json():Promise.reject()).then(doc=>{
+  agents=doc.agents;discovered=doc.discovered||[];$("#asof").textContent="Registry as of "+doc.as_of;
+  $("#f-plat").innerHTML='<option value="">All platforms</option>'+[...new Set(agents.map(a=>a.platform))].sort().map(p=>`<option>${esc(p)}</option>`).join("");
+  render();
+}).catch(()=>{$("#grid").innerHTML='<div class="empty" style="grid-column:1/-1">Could not load <span class="mono">agents.json</span>. Serve this folder (<span class="mono">python -m http.server -d docs</span>, then open /catalog/) or enable GitHub Pages from <span class="mono">docs/</span>.</div>'});
+</script>
+</body>
+</html>

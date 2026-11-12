@@ -50,5 +50,9 @@
     "ApplicationOwner": "Group-Benefits",
     "Environment": "production",
     "CostCenter": "CC-150"
+  },
+  "risk_factors": {
+    "action_scope": "read_only",
+    "customer_impact": "internal_only"
   }
 }

@@ -56,5 +56,28 @@
     "ApplicationOwner": "Retirement-Sales",
     "Environment": "production",
     "CostCenter": "CC-410"
+  },
+  "risk_factors": {
+    "action_scope": "write_internal",
+    "customer_impact": "internal_only"
+  },
+  "behavioral_contract": {
+    "persona": "Meeting note taker for wholesalers",
+    "permitted_intents": [
+      "Draft meeting recaps",
+      "Create follow up tasks in the CRM"
+    ],
+    "constraints": [
+      "Writes activity and task records only, never opportunities or pricing"
+    ],
+    "calls_agents": [],
+    "contract_scan": {
+      "result": "not_run",
+      "last_run": null,
+      "undeclared_capabilities": []
+    },
+    "runtime_guardrail": "none",
+    "tool_vetting": "findings_open",
+    "last_red_team": null
   }
 }
